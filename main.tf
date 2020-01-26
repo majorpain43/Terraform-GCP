@@ -35,6 +35,13 @@
 #   module_depends_on                      = [module.subnets.subnets]
 # }
 
+provider "google" {
+ credentials = "${file("${var.credentials}")}"
+ project     = "${var.gcp_project}" 
+ region      = "${var.region}"
+}
+
+
 module "vpc" {
     source  = "terraform-google-modules/network/google"
     version = "~> 2.0"
