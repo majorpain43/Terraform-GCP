@@ -1,4 +1,4 @@
-
+ 
 # module "vpc" {
 #   source                  = "./modules/vpc"
 #   version                 = "~> 2.0.0"
@@ -46,11 +46,11 @@ module "vpc" {
     source  = "terraform-google-modules/network/google"
     version = "~> 2.0"
 
-    project_id   = "<PROJECT ID>"
-    network_name = var.network_name
-    routing_mode            = var.routing_mode
-    description             = var.description
-    shared_vpc_host         = var.shared_vpc_host
+    project_id   = "${var.project_id}"
+    network_name = "${var.network_name}"
+    routing_mode            = "${var.routing_mode}"
+    description             = "${var.description}"
+    shared_vpc_host         = "${var.shared_vpc_host}"
     subnets = [
         {
             subnet_name           = "subnet-01"
@@ -107,11 +107,33 @@ module "vpc" {
     ]
 }
 
+resource "google_compute_router" "foobar" {
+  name    = "my-router"
+  network = google_compute_network.foobar.name
+  bgp {
+    asn               = 64514
+    advertise_mode    = "CUSTOM"
+    advertised_groups = ["ALL_SUBNETS"]
+    advertised_ip_ranges {
+      range = "1.2.3.4"
+    }
+    advertised_ip_ranges {
+      range = "6.7.0.0/16"
+    }
+  }
+}
+
+resource "google_compute_network" "foobar" {
+  name                    = "my-network"
+  auto_create_subnetworks = false
+}
+
+
 module "cloud-nat" {
   source                             = "terraform-google-modules/cloud-nat/google"
-  project_id                         = var.project_id
-  region                             = var.region
-  router                             = var.router_name
+  project_id                         = "${var.project_id}"
+  region                             = "${var.region}"
+  router                             = "${var.router_name}"
   name                               = "my-cloud-nat-${var.router_name}"
   # nat_ips                            = var.nat_addresses
   min_ports_per_vm                   = "128"
@@ -119,7 +141,6 @@ module "cloud-nat" {
   tcp_established_idle_timeout_sec   = "600"
   tcp_transitory_idle_timeout_sec    = "15"
   udp_idle_timeout_sec               = "15"
-  source_subnetwork_ip_ranges_to_nat = var.source_subnetwork_ip_ranges_to_nat
+  source_subnetwork_ip_ranges_to_nat = "${var.source_subnetwork_ip_ranges_to_nat}"
   # subnetworks                        = var.subnetworks
 }
- 

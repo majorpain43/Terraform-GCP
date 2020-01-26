@@ -21,7 +21,7 @@ variable "network_name" {
 
 variable "router_name" {
   description = "The name of the GCP Router to associate the NAT to"
-  default = "routes-1"
+  default = "gcp_router"
 }
 
 variable "routing_mode" {
